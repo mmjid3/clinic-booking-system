@@ -59,8 +59,6 @@ def book_appointment(request):
 
     if selected_date_str:
         selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-
-        # گرفتن اولین سرویس این دکتر (برای سادگی، فرض میکنیم هر دکتر فقط با سرویس اصلیش نوبت میده)
         service = doctor.services.first()
 
         if service:

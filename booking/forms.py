@@ -27,20 +27,17 @@ class CustomUserCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # حذف فیلد یوزرنیم از فرم برای جلوگیری از خطای اعتبارسنجی
         if 'username' in self.fields:
             del self.fields['username']
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        # چک کردن تکراری بودن ایمیل
         if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("This email address is already registered. Please log in instead.")
         return email
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        # ست کردن یوزرنیم برابر با ایمیل
         user.username = self.cleaned_data['email']
         user.email = self.cleaned_data['email']
         if commit:
