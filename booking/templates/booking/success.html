@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .success-card { background: white; border-radius: 12px; padding: 40px 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 400px; width: 90%; }
+        .icon-circle { width: 80px; height: 80px; background-color: #d4edda; color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 40px; }
+    </style>
+</head>
+<body>
+
+    <div class="success-card">
+        <div class="icon-circle">
+            <i class="fas fa-check"></i>
+        </div>
+        
+        <h3 class="fw-bold mb-3">Booking Confirmed!</h3>
+        <p class="text-muted mb-4">Your appointment has been successfully scheduled.</p>
+        
+        <div class="bg-light p-3 rounded mb-4 text-start">
+            <p class="mb-1"><strong><i class="fas fa-user-md me-2 text-muted"></i>Doctor:</strong> {{ appointment.staff.name }}</p>
+            <p class="mb-1"><strong><i class="fas fa-calendar-alt me-2 text-muted"></i>Date:</strong> {{ appointment.start_time|date:"l, F j, Y" }}</p>
+            <p class="mb-0"><strong><i class="fas fa-clock me-2 text-muted"></i>Time:</strong> {{ appointment.start_time|date:"H:i" }}</p>
+        </div>
+
+        <a href="{% url 'user_dashboard' %}" target="_top" class="btn btn-primary w-100 fw-bold" style="background-color: #00a6a6; border: none;">
+            Go to Dashboard
+        </a>
+    </div>
+
+</body>
+</html>

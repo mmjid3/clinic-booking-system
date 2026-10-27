@@ -1,0 +1,132 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <h3 class="fw-bold mb-0">Hi, {{ user.first_name|default:user.username }} 👋</h3>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm text-center py-4">
+                <i class="fas fa-calendar-check fa-2x mb-3" style="color: #00a6a6;"></i>
+                <h5 class="fw-bold">My Appointments</h5>
+                <p class="text-muted small">You have {{ user.customer_appointments.count }} total appointments.</p>
+                <a href="{% url 'my_appointments' %}" class="btn btn-sm btn-outline-primary mt-auto">View All</a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm text-center py-4">
+                <i class="fas fa-user-edit fa-2x mb-3" style="color: #00a6a6;"></i>
+                <h5 class="fw-bold">Profile Settings</h5>
+                <p class="text-muted small">Update your personal information.</p>
+                <button type="button" class="btn btn-sm btn-outline-primary mt-auto" data-bs-toggle="modal"
+                        data-bs-target="#editProfileModal">
+                    Edit Profile
+                </button>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 border-0 shadow-sm text-center py-4">
+                <i class="fas fa-star fa-2x mb-3" style="color: #00a6a6;"></i>
+                <h5 class="fw-bold">My Reviews</h5>
+                <p class="text-muted small">Manage your feedback to doctors.</p>
+                <a href="{% url 'my_reviews' %}" class="btn btn-sm btn-outline-primary mt-auto">Manage</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="fas fa-history me-2" style="color: #00a6a6;"></i> Recent Appointments
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 text-center align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Doctor</th>
+                        <th>Service</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for appt in recent_appointments %}
+                        <tr>
+                            <td class="fw-bold">{{ appt.staff.name }}</td>
+                            <td>{{ appt.service.name }}</td>
+                            <td>{{ appt.start_time|date:"M d, Y - H:i" }}</td>
+                            <td>
+                                {% if appt.status == 'confirmed' %}
+                                    <span class="badge bg-success">Confirmed</span>
+                                {% elif appt.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ appt.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-muted py-4">No appointments found. <a href="{% url 'home' %}">Book
+                                one now!</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="editProfileModalLabel"><i class="fas fa-user-edit me-2"
+                                                                                  style="color: #00a6a6;"></i> Edit
+                        Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form method="post" action="{% url 'edit_profile' %}">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold">Email Address</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary fw-bold"
+                                    style="background-color: #00a6a6; border: none;">Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

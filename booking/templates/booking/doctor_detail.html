@@ -1,0 +1,147 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center p-4">
+                    <img src="{{ doctor.image_url }}" alt="{{ doctor.name }}" class="rounded-circle mb-3 shadow"
+                         style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #e0f7fa;">
+                    <h4 class="fw-bold mb-1">{{ doctor.name }}</h4>
+                    <p class="text-primary fw-bold mb-3">{{ doctor.specialty }}</p>
+
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="text-warning me-1">
+                            <i class="fas fa-star"></i>
+                            <span class="text-dark fw-bold ms-1">{{ avg_rating }}</span>
+                        </div>
+                        <span class="text-muted small">({{ total_reviews }} Reviews)</span>
+                    </div>
+
+                    <button type="button" class="btn btn-success w-100 fw-bold mb-2"
+                            style="background-color: #7cb342; border: none;" data-bs-toggle="modal"
+                            data-bs-target="#bookingModal">
+                        Get Instant Appointment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-info-circle text-primary me-2"></i> About the Doctor</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item px-0"><i class="fas fa-id-badge me-2 text-muted"></i> Medical Code:
+                            <strong>{{ doctor.medical_code|default:"N/A" }}</strong></li>
+                        <li class="list-group-item px-0"><i class="fas fa-map-marker-alt me-2 text-muted"></i> Address:
+                            <strong>{{ doctor.address }}</strong></li>
+                        <li class="list-group-item px-0"><i class="fas fa-clock me-2 text-muted"></i> Working Hours:
+                            <strong>{{ doctor.work_start_time|time:"H:i" }}
+                                - {{ doctor.work_end_time|time:"H:i" }}</strong></li>
+                    </ul>
+                    <p class="text-muted">{{ doctor.bio|default:"This doctor has not provided a biography yet." }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-comments text-primary me-2"></i> Patient Reviews
+                        ({{ total_reviews }})</h5>
+
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                                data-bs-target="#addReviewModal">
+                            Write a Review
+                        </button>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% for review in reviews %}
+                        <div class="d-flex mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                            <img src="https://ui-avatars.com/api/?name={{ review.patient.username|lower }}&background=00a6a6&color=fff"
+                                 class="rounded-circle me-3" width="50" height="50">
+                            <div>
+                                <h6 class="fw-bold mb-1">
+                                    {{ review.patient.username }}
+                                    <span class="text-warning ms-2 small">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="fas fa-star"></i>
+                                            {% else %}
+                                                <i class="far fa-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </h6>
+                                <p class="small text-muted mb-0">{{ review.comment }}</p>
+                                <small class="text-muted"
+                                       style="font-size: 0.7rem;">{{ review.created_at|date:"M d, Y" }}</small>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No reviews yet for this doctor.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="bookingModalLabel">Book Appointment with {{ doctor.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{% url 'book_appointment' %}?doctor_id={{ doctor.pk }}" width="100%" height="550px"
+                            style="border: none; border-radius: 0 0 10px 10px;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Review Modal -->
+    <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="addReviewModalLabel">Review Dr. {{ doctor.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form method="post" action="{% url 'add_doctor_review' doctor.pk %}">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Rating</label>
+                            <select name="rating" class="form-select" required>
+                                <option value="5">5 Stars - Excellent</option>
+                                <option value="4">4 Stars - Very Good</option>
+                                <option value="3">3 Stars - Average</option>
+                                <option value="2">2 Stars - Poor</option>
+                                <option value="1">1 Star - Terrible</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold">Your Comment</label>
+                            <textarea name="comment" class="form-control" rows="3"
+                                      placeholder="Share your experience..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold"
+                                style="background-color: #00a6a6; border: none;">Submit Review
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

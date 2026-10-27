@@ -1,0 +1,26 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-md-5">
+        <div class="card shadow border-0 rounded-4 text-center">
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <i class="fas fa-sign-out-alt fa-4x" style="color: #00a6a6;"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Are you sure you want to log out?</h4>
+                <p class="text-muted mb-4">You will need to log in again to access your appointments.</p>
+
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="{% url 'user_dashboard' %}" class="btn btn-light px-4 border">Cancel</a>
+
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'booking/base.html' %}
+
+{% block content %}
+<div class="row mb-5 align-items-center bg-white p-4 rounded shadow-sm">
+    <div class="col-md-8">
+        <h1 class="display-5 fw-bold text-dark">Find the Best Doctors Near You</h1>
+        <p class="lead text-muted mt-2">Book your appointment online easily and securely. Choose your specialist and get the care you deserve.</p>
+        <a href="#doctors-list" class="btn btn-lg text-white mt-3" style="background-color: #00a6a6;">Find a Doctor</a>
+    </div>
+    <div class="col-md-4 text-center d-none d-md-block">
+        <i class="fas fa-user-md fa-10x" style="color: #00a6a6; opacity: 0.8;"></i>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sidebar Categories -->
+    <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold py-3">Categories</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><a href="{% url 'home' %}" class="text-decoration-none text-dark">All Specialties</a></li>
+                <li class="list-group-item"><a href="?specialty=Cardiology" class="text-decoration-none text-dark">Cardiology (Heart)</a></li>
+                <li class="list-group-item"><a href="?specialty=Dermatology" class="text-decoration-none text-dark">Dermatology (Skin)</a></li>
+                <li class="list-group-item"><a href="?specialty=Dentistry" class="text-decoration-none text-dark">Dentistry</a></li>
+                <li class="list-group-item"><a href="?specialty=Neurology" class="text-decoration-none text-dark">Neurology (Brain)</a></li>
+                <li class="list-group-item"><a href="?specialty=Pediatrics" class="text-decoration-none text-dark">Pediatrics (Kids)</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Doctors List -->
+    <div class="col-md-9" id="doctors-list">
+        <h3 class="mb-4 fw-bold text-dark">Our Specialists</h3>
+        <div class="row">
+            {% for staff in staff_members %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 rounded-4 d-flex flex-column">
+                    <div class="card-body text-center p-4 d-flex flex-column">
+                        <a href="{% url 'doctor_detail' staff.pk %}">
+                            <img src="{{ staff.image_url }}" alt="{{ staff.name }}" class="rounded-circle mb-3 shadow-sm" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #00a6a6;">
+                        </a>
+
+                        <h5 class="card-title fw-bold mb-1">
+                            <a href="{% url 'doctor_detail' staff.pk %}" class="text-decoration-none text-dark">{{ staff.name }}</a>
+                        </h5>
+                        <p class="text-primary small fw-bold mb-2">{{ staff.specialty }}</p>
+
+                        <div class="mb-3">
+                            {% for service in staff.services.all|slice:":2" %}
+                                <span class="badge bg-light text-dark border">{{ service.name }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-map-marker-alt me-1"></i> {{ staff.address|truncatechars:20 }}
+                        </p>
+
+                        <a href="{% url 'doctor_detail' staff.pk %}" class="btn btn-outline-primary w-100 mt-auto fw-bold" style="border-color: #00a6a6; color: #00a6a6;">
+                            View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
